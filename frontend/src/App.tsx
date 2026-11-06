@@ -2,9 +2,10 @@ import "./App.css";
 import { useState } from "react";
 import GoalList from "./components/GoalList";
 import type { Goal } from './types/goal';
+import { fetchGoals } from "./api/goal";
 
 function App() {
-  const [goals, setGoals] = useState<[Goal[]]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
@@ -12,16 +13,12 @@ function App() {
   const getGoals = async () => {
     setError(null);
     setIsLoading(true);
-
     try {
       // 오류가 발생할 수 있는 코드
-      const response = await fetch("http://localhost:3000/goals");
+      // await은 Promise가 거부되면 그 에러를 현재 위치에서 던져진 것 처럼 전달을
+      // 하기 때문에 catch에서 에러를 잡을 수 있음. 
+      const data = await fetchGoals();
 
-      if (!response.ok) {
-        throw new Error("API 요청에 실패했습니다.");
-      }
-
-      const data = await response.json();
       setGoals(data);
       setHasLoaded(true);
     } catch (error) {
