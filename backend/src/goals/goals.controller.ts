@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { GoalsService } from './goals.service.js';
 
 // /goals로 들어오는 HTTP 요청을 이 Controller가 담당한다.
@@ -7,9 +14,7 @@ export class GoalsController {
   // constructor는 클래스로 객체가 만들어질때 실행되는 특별한 매서드
   // private는 property를 GoalsController 내부에서만 사용하겠다는 의미
   // readonly는 한번 설정된 property를 나중에 다른 값으로 다시 할당하지 못하게 함
-  constructor(
-    private readonly goalsService: GoalsService,
-  ) {}
+  constructor(private readonly goalsService: GoalsService) {}
 
   @Get()
   // 사람이 코드를 읽기 쉽게 우리가 의미 있게 붙이는 것일 뿐인 이름
@@ -25,5 +30,11 @@ export class GoalsController {
   // @Param('id')는 Nest JS에게 URL parameter중 'id'라는 이름의 값을 찾아서 바로 뒤의 함수 매개변수에 넣어줘. 라는 의미
   getGoal(@Param('id', ParseIntPipe) id: number) {
     return this.goalsService.getGoal(id);
+  }
+
+  @Post()
+  //@Body는 요청 본문에 담긴 JSON 데이터를 body 매개변수로 받아오는 역할을 함
+  createGoal(@Body() body: { name: string; goalAmount: number }) {
+    return this.goalsService.createGoal(body.name, body.goalAmount);
   }
 }

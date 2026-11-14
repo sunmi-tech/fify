@@ -3,3 +3,8 @@ export type Goal = {
     name: string;
     goalAmount: number;
 };
+
+export type CreateGoalInput = {
+    name: string;
+    goalAmount: number;
+};

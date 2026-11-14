@@ -39,4 +39,19 @@ export class GoalsService {
 
     return goal;
   }
+
+  createGoal(name: string, goalAmount: number): Goal {
+    // 1. 새 Goal 객체 생성
+    const newGoal: Goal = {
+      id: this.goals.length + 1,
+      name: name,
+      goalAmount: goalAmount 
+    }
+    // 2. this.goals 배열에 추가
+    // 서버의 목표 목록에 저장
+    this.goals.push(newGoal)
+    // 3. 생성한 Goal 반환
+    // 함수를 호출한 쪽에 생성 결과 전달 
+    return newGoal;
+  }
 }

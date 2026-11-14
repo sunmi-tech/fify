@@ -1,6 +1,7 @@
 import "./App.css";
 import GoalList from "./components/GoalList";
 import { useGoals } from "./hooks/useGoals";
+import GoalForm from "./components/GoalForm";
 
 function App() {
   const {
@@ -9,6 +10,7 @@ function App() {
     error,
     hasLoaded,
     getGoals,
+    addGoal,
   } = useGoals();
 
   return (
@@ -29,6 +31,7 @@ function App() {
         오른쪽 { goals } -> App 에서 useState로 관리하는 상태변수
        */}
       <GoalList goals={goals} />
+      <GoalForm onAddGoal={addGoal} />
     </div>
   );
 }
