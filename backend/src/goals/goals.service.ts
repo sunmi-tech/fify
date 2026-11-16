@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 
 type Goal = {
   id: number;
@@ -41,6 +41,15 @@ export class GoalsService {
   }
 
   createGoal(name: string, goalAmount: number): Goal {
+
+    const exists = this.goals.some(
+      (goal) => goal.name === name,
+    );
+
+    if(exists){
+      throw new ConflictException('중복된 목표 이름입니다.')
+    }
+
     // 1. 새 Goal 객체 생성
     const newGoal: Goal = {
       id: this.goals.length + 1,
@@ -53,5 +62,15 @@ export class GoalsService {
     // 3. 생성한 Goal 반환
     // 함수를 호출한 쪽에 생성 결과 전달 
     return newGoal;
+  }
+
+  updateGoal(id: number, name?: string, goalAmount?: number): Goal {
+    // TODO: this.getGoal(id)를 호출해서
+    // 기존 목표를 goal 변수에 저장하기 
+    const goal = this.getGoal(id);
+    goal.name = name ?? goal.name;
+    goal.goalAmount = goalAmount ?? goal.goalAmount;
+
+    return goal;
   }
 }

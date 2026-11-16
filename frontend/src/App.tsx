@@ -11,6 +11,7 @@ function App() {
     hasLoaded,
     getGoals,
     addGoal,
+    editGoal
   } = useGoals();
 
   return (
@@ -30,7 +31,7 @@ function App() {
         왼쪽 goals -> 자식 컴포넌트에 전달하는 props 이름
         오른쪽 { goals } -> App 에서 useState로 관리하는 상태변수
        */}
-      <GoalList goals={goals} />
+      <GoalList goals={goals} onEditGoal={editGoal} />
       <GoalForm onAddGoal={addGoal} />
     </div>
   );

@@ -5,8 +5,11 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Patch,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service.js';
+import { CreateGoalDto } from './dto/create-goal.dto.js';
+import { UpdatedGoalDto } from './dto/update-goal.dto.js';
 
 // /goals로 들어오는 HTTP 요청을 이 Controller가 담당한다.
 @Controller('goals')
@@ -34,7 +37,22 @@ export class GoalsController {
 
   @Post()
   //@Body는 요청 본문에 담긴 JSON 데이터를 body 매개변수로 받아오는 역할을 함
-  createGoal(@Body() body: { name: string; goalAmount: number }) {
+  // new ValidationPipe는 ValidationPipe 클래스의 인스턴스를 생성하는 코드
+  // @UsePipse는 NestJS에게 이 API를 처리할 때 지정한 Pipe를 사용하라고 알려주는 데코레이터 
+  createGoal(@Body() body: CreateGoalDto) {
     return this.goalsService.createGoal(body.name, body.goalAmount);
+  }
+
+  @Patch(':id')
+  updateGoal(
+    @Param('id', ParseIntPipe) id:number,
+    @Body() body: UpdatedGoalDto,
+  ) {
+    // TODO: GoalService의 updateGoal() 호출
+    return this.goalsService.updateGoal(
+      id,
+      body.name,
+      body.goalAmount
+    )
   }
 }
