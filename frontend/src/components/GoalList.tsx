@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Goal, UpdateGoalInput } from "../types/goal";
 
 type GoalListProps = {
@@ -14,6 +15,10 @@ type GoalListProps = {
  *
  */
 function GoalList({ goals, onEditGoal }: GoalListProps) {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
   return (
     <div>
       <h2>나의 목표</h2>
@@ -31,9 +36,69 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
 
               
             */}
-            <button onClick={() => onEditGoal(goal.id, { name: "세계여행" })}>
-              수정
+            {editingId === goal.id ? (
+              <div>
+                <input
+                  value={editName}
+                  onChange={(event) => setEditName(event.target.value)}
+                />
+                <input
+                  type="number"
+                  value={editAmount}
+                  onChange={(event) => setEditAmount(event.target.value)}
+                />
+
+                <button
+                  onClick={() => {
+                    setEditingId(null);
+                  }}
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setEditingId(goal.id);
+                  setEditName(goal.name);
+                  setEditAmount(String(goal.goalAmount));
+                  setEditError(null);
+                }}
+              >
+                수정
+              </button>
+            )}
+            <button
+              onClick={async () => {
+                setEditError(null);
+
+                if (editName.trim() === "") {
+                  setEditError("목표 이름을 입력해 주세요.");
+                  return;
+                }
+
+                const goalAmount = Number(editAmount);
+                if (!Number.isInteger(goalAmount) || goalAmount <= 0) {
+                  setEditError('올바른 목표 금액을 입력해 주세요.');
+                  return;
+                }
+
+                try {
+
+                  await onEditGoal(goal.id, {
+                    name: editName,
+                    goalAmount: goalAmount,
+                  });
+                  setEditingId(null);
+                } catch (error) {
+                  console.log(error);
+                  setEditError("목표 수정에 실패했습니다.");
+                }
+              }}
+            >
+              저장
             </button>
+            {editError && <p role="alert">{editError}</p>}
           </div>
         );
       })}
