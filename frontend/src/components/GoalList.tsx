@@ -19,6 +19,7 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   return (
     <div>
       <h2>나의 목표</h2>
@@ -55,6 +56,40 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
                 >
                   취소
                 </button>
+                <button
+                  disabled={isSaving}
+                  onClick={async () => {
+                    setEditError(null);
+
+                    if (editName.trim() === "") {
+                      setEditError("목표 이름을 입력해 주세요.");
+                      return;
+                    }
+
+                    const goalAmount = Number(editAmount);
+                    if (!Number.isInteger(goalAmount) || goalAmount <= 0) {
+                      setEditError("올바른 목표 금액을 입력해 주세요.");
+                      return;
+                    }
+                    
+                    setIsSaving(true);
+                    try {
+                      await onEditGoal(goal.id, {
+                        name: editName,
+                        goalAmount: goalAmount,
+                      });
+                      setEditingId(null);
+                    } catch (error) {
+                      console.log(error);
+                      setEditError("목표 수정에 실패했습니다.");
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }}
+                >
+                  {isSaving ? "저장중" : "저장"}
+                </button>
+                {editError && <p role="alert">{editError}</p>}
               </div>
             ) : (
               <button
@@ -68,37 +103,6 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
                 수정
               </button>
             )}
-            <button
-              onClick={async () => {
-                setEditError(null);
-
-                if (editName.trim() === "") {
-                  setEditError("목표 이름을 입력해 주세요.");
-                  return;
-                }
-
-                const goalAmount = Number(editAmount);
-                if (!Number.isInteger(goalAmount) || goalAmount <= 0) {
-                  setEditError('올바른 목표 금액을 입력해 주세요.');
-                  return;
-                }
-
-                try {
-
-                  await onEditGoal(goal.id, {
-                    name: editName,
-                    goalAmount: goalAmount,
-                  });
-                  setEditingId(null);
-                } catch (error) {
-                  console.log(error);
-                  setEditError("목표 수정에 실패했습니다.");
-                }
-              }}
-            >
-              저장
-            </button>
-            {editError && <p role="alert">{editError}</p>}
           </div>
         );
       })}

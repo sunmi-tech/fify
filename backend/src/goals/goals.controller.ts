@@ -6,6 +6,7 @@ import {
   Post,
   Body,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { GoalsService } from './goals.service.js';
 import { CreateGoalDto } from './dto/create-goal.dto.js';
@@ -53,6 +54,13 @@ export class GoalsController {
       id,
       body.name,
       body.goalAmount
+    )
+  }
+
+  @Delete(':id')
+  deleteGoal(@Param('id', ParseIntPipe) id:number): void  {
+    return this.goalsService.deleteGoal(
+      id
     )
   }
 }

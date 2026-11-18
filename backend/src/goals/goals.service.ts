@@ -9,6 +9,8 @@ type Goal = {
 // NestJS가 이 클래스를 관리하고, 필요한 곳에 제공할 수 있게한다.
 @Injectable()
 export class GoalsService {
+  private nextId = 3;
+
   private readonly goals: Goal[] = [
     {
       id: 1,
@@ -50,9 +52,12 @@ export class GoalsService {
       throw new ConflictException('중복된 목표 이름입니다.')
     }
 
+    const ids = this.goals.map((goal) => goal.id);
+    const newId = this.nextId++;
+
     // 1. 새 Goal 객체 생성
     const newGoal: Goal = {
-      id: this.goals.length + 1,
+      id: newId,
       name: name,
       goalAmount: goalAmount 
     }
@@ -72,5 +77,17 @@ export class GoalsService {
     goal.goalAmount = goalAmount ?? goal.goalAmount;
 
     return goal;
+  }
+
+  deleteGoal(id: number): void {
+    const index = this.goals.findIndex(
+      (goal) => goal.id === id
+    );
+
+    if (index === -1) {
+      throw new NotFoundException('삭제할 목표를 찾을 수 없습니다.')
+    }
+
+    this.goals.splice(index, 1);
   }
 }
