@@ -67,3 +67,17 @@ export async function updateGoal(id: number, input: UpdateGoalInput): Promise<Go
    * => 응답 본문을 읽고 JSON을 JavaScript 값으로 파싱하는 매서드도 비동기 함수
    */
 }
+
+export async function deleteGoal(id: number): Promise<void> {
+  // TODO : Delete 요청 작성
+  const response = await fetch(`http://localhost:3000/goals/${id}`, {
+    method: "DELETE",
+    // content-type : application/json은 요청 본문이 JSON 형식이라는 의미인데
+    // DELETE method는 요청 본문이 없기 때문에 불필요
+  });
+
+  // fetch 요청은 서버가 400이나 500을 반환해도 자동으로 에러를 발생시키지 않는다.
+  if(!response.ok) {
+    throw new Error("목표 삭제에 실패했습니다.");
+  }
+}

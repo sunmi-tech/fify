@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Goal, CreateGoalInput, UpdateGoalInput } from "../types/goal";
-import { fetchGoals, createGoal, updateGoal } from "../api/goal";
+import { fetchGoals, createGoal, updateGoal, deleteGoal } from "../api/goal";
 
 export function useGoals() {
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -59,6 +59,14 @@ export function useGoals() {
     );
   };
 
+  const removeGoal = async(id: number) => {
+    await deleteGoal(id);
+
+    setGoals((prevGoals) => 
+      prevGoals.filter((goal) => goal.id !== id )
+    );
+  };
+
   // 객체 리터럴의 속성 축약 문법으로
   // return { goals: goals, setGoals: setGoals }; 와 같은 의미
   return {
@@ -68,6 +76,7 @@ export function useGoals() {
     hasLoaded,
     getGoals,
     addGoal,
-    editGoal
+    editGoal,
+    removeGoal
   };
 }

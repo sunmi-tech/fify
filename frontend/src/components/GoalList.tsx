@@ -6,6 +6,7 @@ type GoalListProps = {
 
   // TODO: onEditGoal 함수 타입 추가
   onEditGoal: (id: number, input: UpdateGoalInput) => Promise<void>;
+  onDeleteGoal: (id: number) => Promise<void>;
 };
 
 /**
@@ -14,12 +15,15 @@ type GoalListProps = {
  * 리엑트는 컴포넌트에 전달한 속성들을 하나의 Props 객체로 묶어서 전달함
  *
  */
-function GoalList({ goals, onEditGoal }: GoalListProps) {
+function GoalList({ goals, onEditGoal, onDeleteGoal }: GoalListProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
   return (
     <div>
       <h2>나의 목표</h2>
@@ -71,7 +75,7 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
                       setEditError("올바른 목표 금액을 입력해 주세요.");
                       return;
                     }
-                    
+
                     setIsSaving(true);
                     try {
                       await onEditGoal(goal.id, {
@@ -92,20 +96,49 @@ function GoalList({ goals, onEditGoal }: GoalListProps) {
                 {editError && <p role="alert">{editError}</p>}
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  setEditingId(goal.id);
-                  setEditName(goal.name);
-                  setEditAmount(String(goal.goalAmount));
-                  setEditError(null);
-                }}
-              >
-                수정
-              </button>
+              <div>
+                <button
+                  onClick={() => {
+                    setEditingId(goal.id);
+                    setEditName(goal.name);
+                    setEditAmount(String(goal.goalAmount));
+                    setEditError(null);
+                  }}
+                >
+                  수정
+                </button>
+                <button
+                  disabled={deletingId === goal.id}
+                  onClick={async () => {
+                    const confirmed = window.confirm("정말 이 목표를 삭제하시겠습니까?")
+
+                    if(!confirmed) {
+                      return ;
+                    }
+                    
+                    setDeleteError(null);
+                    setDeletingId(goal.id);
+                    try {
+                      // await이 빠지면 삭제 요청이 완료되기 전에 try 블록의 실행이 끝날 수 있다.
+                      await onDeleteGoal(goal.id);
+                    } catch (error) {
+                      console.log(error);
+                      setDeleteError("목표 삭제에 실패했습니다.");
+                    } finally {
+                      setDeletingId(null);
+                    }
+                  }}
+                >
+                  { deletingId === goal.id ? "삭제중" : "삭제"}
+                </button>
+                
+              </div>
             )}
+
           </div>
         );
       })}
+      {deleteError && <p role="alert">{deleteError}</p>}
     </div>
   );
 }
