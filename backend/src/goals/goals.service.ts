@@ -1,9 +1,17 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { pool } from '../database/database.js';
+import type { RowDataPacket } from 'mysql2';
 
 type Goal = {
   id: number;
   name: string;
   goalAmount: number;
+}
+// MySQL에서 조회한 데이터 구조 
+interface GoalRow extends RowDataPacket {
+  id: number;
+  name: string;
+  goal_amount: number
 }
 
 // NestJS가 이 클래스를 관리하고, 필요한 곳에 제공할 수 있게한다.
@@ -24,8 +32,18 @@ export class GoalsService {
     },
   ];
 
-  getGoals(): Goal[] {
-    return this.goals;
+  async getGoals(): Promise<Goal[]> {
+    const [rows] = await pool.query<GoalRow[]>('SELECT * FROM goals');
+    
+    const goals = rows.map((row) => {
+      return {
+        id : row.id,
+        name: row.name,
+        goalAmount: row.goal_amount
+      };
+    });
+
+    return goals;
   }
 
   getGoal(id: number): Goal{
